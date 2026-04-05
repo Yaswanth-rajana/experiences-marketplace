@@ -9,9 +9,9 @@ A production-style backend API for an experiences marketplace where users can br
 Routes → Controllers → Services → Database
 
 * **Routes**: Define endpoints
-* **Controllers**: Handle HTTP logic
+* **Controllers**: Handle HTTP request/response
 * **Services**: Business logic
-* **Database**: PostgreSQL with constraints & indexes
+* **Database**: PostgreSQL with constraints and indexes
 
 ---
 
@@ -89,6 +89,64 @@ npm run dev
 
 ---
 
+## 🧪 Example cURL Requests
+
+### 🔐 Signup
+
+```bash
+curl -X POST http://localhost:3000/api/auth/signup \
+-H "Content-Type: application/json" \
+-d '{"email":"user@example.com","password":"123456","role":"user"}'
+```
+
+### 🔐 Login
+
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+-H "Content-Type: application/json" \
+-d '{"email":"user@example.com","password":"123456"}'
+```
+
+### 🎯 Create Experience (Host/Admin)
+
+```bash
+curl -X POST http://localhost:3000/api/experiences \
+-H "Authorization: Bearer <host_token>" \
+-H "Content-Type: application/json" \
+-d '{"title":"Yoga","location":"Goa","price":500,"start_time":"2026-05-01T10:00:00Z"}'
+```
+
+### 🚀 Publish Experience
+
+```bash
+curl -X PATCH http://localhost:3000/api/experiences/1/publish \
+-H "Authorization: Bearer <host_or_admin_token>"
+```
+
+### 🚫 Block Experience (Admin)
+
+```bash
+curl -X PATCH http://localhost:3000/api/experiences/1/block \
+-H "Authorization: Bearer <admin_token>"
+```
+
+### 🌍 List Published Experiences
+
+```bash
+curl -X GET "http://localhost:3000/api/experiences?page=1&limit=10&sort=asc"
+```
+
+### 🎟️ Book Experience
+
+```bash
+curl -X POST http://localhost:3000/api/experiences/1/book \
+-H "Authorization: Bearer <user_token>" \
+-H "Content-Type: application/json" \
+-d '{"seats":2}'
+```
+
+---
+
 ## 🧠 RBAC Rules Implemented
 
 * Only **user or host** can signup (admin cannot self-assign)
@@ -105,7 +163,7 @@ npm run dev
 * Duplicate email → **409 Conflict**
 * Invalid ID format → **400 Bad Request**
 * Book unpublished experience → **400 Bad Request**
-* Duplicate confirmed booking → **409 Conflict** (partial unique index)
+* Duplicate confirmed booking → **409 Conflict (partial unique index)**
 * Non-owner publish → **403 Forbidden**
 * Non-admin block → **403 Forbidden**
 * Missing JWT → **401 Unauthorized**
@@ -127,7 +185,7 @@ npm run dev
 ## 🔐 Security Considerations
 
 * Passwords hashed with bcrypt (10 rounds)
-* JWT includes **sub (standard claim)** and role
+* JWT includes `sub` (standard claim) and role
 * Environment validation on startup (fail-fast)
 * ID parameter validation (prevents NaN injection)
 * `requireOwnerOrAdmin` middleware prevents IDOR
@@ -158,15 +216,15 @@ npm run dev
 
 This project was built with a **production-first mindset**:
 
-* Focused on correctness, security, and clear RBAC rules
+* Focused on correctness, security, and strict RBAC enforcement
 * Avoided over-engineering beyond assignment scope
 * Used database constraints (partial unique index) for data integrity
 * Designed architecture to scale easily
 
 **Trade-offs:**
 
-* Did not implement rate limiting, capacity, or soft deletes due to time constraints
-* Architecture supports adding these without refactoring
+* Did not implement rate limiting, capacity management, or soft deletes due to time constraints
+* These can be added without architectural changes
 
 ---
 
@@ -183,4 +241,6 @@ All implementation and logic decisions were manually reviewed and verified.
 
 ---
 
+## 📄 License
 
+MIT
